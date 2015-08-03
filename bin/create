@@ -1,0 +1,65 @@
+#!/bin/bash 
+# Author: leftist0329@gmail.com
+
+Config(){
+    ROOTDIR=/var/lib/libvirt/images/fab
+    POOL=$ROOTDIR/pool
+    CENTOS=$ROOTDIR/base/centos7-base.qcow2
+    UBUNTU=$ROOTDIR/base/ubuntu1404-base.qcow2
+    BASEXML=$ROOTDIR/xml/base.xml
+    AUTOSTART=Y
+    CPU="1"
+    MEM="4192000"
+    NAME=$PTOJ
+}
+
+Clear(){
+    rm -rf $POOL/$PROJ
+    mkdir -p $POOL/$PROJ
+}
+
+Build_Disk(){
+    if [ "$OS" == "centos" ]; then
+	    qemu-img create -f qcow2 -o backing_file=$CENTOS  $POOL/$PROJ/$PROJ.qcow2
+    elif [ "$OS" == "ubuntu" ]; then
+	    qemu-img create -f qcow2 -o backing_file=$UBUNTU  $POOL/$PROJ/$PROJ.qcow2
+    else
+	    echo "INPUT ERROR"
+	    exit 1
+    fi
+}
+
+Build_XML(){
+    cp $BASEXML $POOL/$PROJ/$PROJ.xml
+    sed -i s"/{{NAME}}/$PROJ/"g  $POOL/$PROJ/$PROJ.xml
+    sed -i s"/{{CPU}}/$CPU/"g  $POOL/$PROJ/$PROJ.xml
+    sed -i s"/{{MEM}}/$MEM/"g  $POOL/$PROJ/$PROJ.xml
+    DISK=$(echo $POOL/$PROJ/$PROJ.qcow2| sed 's_/_\\/_g')
+    sed -i s"/{{DISK}}/$DISK/"g  $POOL/$PROJ/$PROJ.xml
+}
+
+echo "#######"
+echo "START~"
+echo "#######"
+
+if [ -z "$1" ]; then  
+    read -e -p "Project Name=? " PROJ
+else  
+    PROJ=$1
+fi
+
+if [ -z "$2" ]; then  
+    read -e -p "centOS or ubuntu" OS
+else  
+    OS=$2
+fi
+Config
+Clear
+Build_Disk
+Build_XML
+
+sudo virsh define $POOL/$PROJ/$PROJ.xml
+if [ "$AUTOSTART" == "Y" ]; then
+	sudo virsh start $PROJ
+fi
+#sudo virsh list --all|grep $PROJ

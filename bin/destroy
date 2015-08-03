@@ -1,0 +1,13 @@
+#!/bin/bash
+# Author: leftist0329@gmail.com
+
+ROOTDIR=/var/lib/libvirt/images/fab
+POOL=$ROOTDIR/pool
+
+for vm in `ls $POOL`
+do
+	echo "["$vm"]: GoodBye Sir"
+	sudo virsh destroy $vm >/dev/null 2>&1
+	sudo virsh undefine $vm >/dev/null 2>&1
+	sudo rm -rf $POOL/$vm >/dev/null 2>&1
+done

@@ -1,2 +1,3 @@
-# kvmFactory
-Control Multiple KVM-Hypervisor to build my VM for Test 
+kvmFactory
+    * Control Multiple KVM-Hypervisor
+    * Create VMs for CI/QA Testing
