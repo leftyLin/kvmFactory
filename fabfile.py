@@ -9,8 +9,12 @@
 from fabric.api import local,run,put,parallel,hosts
 
 def help():
-    print('[initial, create, destroy, localcreate, localdestroy, localsync, syncfile, syncimg]')
-    print('fab -H root@mark29 create:test1,ubuntu')
+    print ""
+    print "kvmFactory"
+    print "func: "
+    print('    initial, create, destroy, localcreate, localdestroy, localsync, syncfile, syncimg')
+    print "usage: "
+    print("    fab -H root@mark29 create:test1,ubuntu")
 
 def initial():
     # Setup Server 
@@ -46,7 +50,7 @@ def localcreate(proj=None,os=None):
         print "Proj=? OS=?"
     else:
         print "Let's Do it!"
-        local("~/repo/fab/bin/create %s %s" %(proj, os))
+        local("sudo ~/desktop/repo/fab/bin/create %s %s" %(proj, os))
 
 def localsync():
     local("rm -rf ~/desktop/repo/fab/bin")
@@ -56,7 +60,7 @@ def localsync():
     local("chmod 755 ~/desktop/repo/fab/bin/*")
 
 @parallel
-@hosts('root@mark29', 'root@mark12')
+@hosts('root@mark29')
 def syncfile():
     # Sync xml/, bin/
     run("if [ ! -d /var/lib/libvirt/images/fab ];then mkdir /var/lib/libvirt/images/fab;fi")
@@ -68,13 +72,13 @@ def syncfile():
     run("chmod 755 /var/lib/libvirt/images/fab/bin/*")
 
 @parallel
-@hosts('root@mark29', 'root@mark12')
+@hosts('root@mark29')
 def syncimg():
     # Sync img
     put("~/desktop/repo/fab/base","/var/lib/libvirt/images/fab/")
 
 @parallel
-@hosts('root@mark29', 'root@mark12')
+@hosts('root@mark29')
 def destroyall():
     # Destroy all, Erase all
     print ""
@@ -103,4 +107,4 @@ def localdestroy():
     print "    The Clean Slate Protocol    "
     print "################################"
     print ""
-    local("~/desktop/repo/fab/bin/destroy")
+    local("sudo ~/desktop/repo/fab/bin/destroy")
